@@ -31,27 +31,31 @@ https://raytracing.github.io
 
 <h1>Blender Support</h1>
 To convert a blender scene into the raytracer I made a python script (its bad).
-First all the meshes in your scene need to be tris not quad to convert them you can use the triangulate modifier:
+
+First to optimize the rendering engine if the object has `sphere` in its name is will be considered as a sphere with a fixed radius and nothing else
+
+And if it has `plane` it will be considered as an infinite plane and nothing else
+
+Next all the meshes in your scene need to be tris not quad to convert them you can use the triangulate modifier:
 First add the modifier the object
 
-![image](https://github.com/legoman080107/Numworks-Modular-Raytracing/blob/main/image/Triangulate.png)
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/Triangulate.png)
 
 Then apply it
 
-![image](https://github.com/legoman080107/Numworks-Modular-Raytracing/blob/main/image/Apply_triangulate.png)
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/Apply_triangulate.png)
 
 Next, you need to select all the object in the scene and then run the script
 
-![image](https://github.com/legoman080107/Numworks-Modular-Raytracing/blob/main/image/Run_script.png)
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/Run_script.png)
 
 The output of the script will be in a file named ‘scene.txt’.
 
-![image](https://github.com/legoman080107/Numworks-Modular-Raytracing/blob/main/image/Output.png)
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/Output.png)
 
 Just copy the content of the file in the appropriate part of the code
 
 <h1>Template to add object manually</h1>
-
 
 
 mesh
