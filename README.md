@@ -114,7 +114,8 @@ pc-11m 43s numworks n110 ~32h 10m 19s
 146,75
 
 <h1>For The futur</h1>
-For the future of this project, I would like to add glass support
+
+For the future of this project, I would like to add glass support and fix the glitches with the mesh and planes
 
 Some’s optimization
 
