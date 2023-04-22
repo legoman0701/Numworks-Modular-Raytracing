@@ -107,6 +107,8 @@ plane
 
 <h1>Somes images</h1>
 
+146,75
+
 <h1>For The futur</h1>
 For the future of this project, I would like to add glass support
 
