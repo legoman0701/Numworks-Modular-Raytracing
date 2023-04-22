@@ -111,6 +111,10 @@ pc-11m 43s numworks n110 ~32h 10m 19s
 
 ![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%2011m%2043s.png)
 
+pc-5m 12s numworks n110 ~12h 43m 6s
+
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%205m%2012s.png)
+
 146,75
 
 <h1>For The futur</h1>
