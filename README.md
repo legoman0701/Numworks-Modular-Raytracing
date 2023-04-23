@@ -124,3 +124,5 @@ For the future of this project, I would like to add glass support and fix the gl
 Some’s optimization
 
 And convert this code to C++ to make it into a Numworks app to run faster but i dont C how to do it (sorry)
+
+(Sorry for bad English)
