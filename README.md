@@ -36,6 +36,8 @@ First to optimize the rendering engine if the object has `sphere` in its name is
 
 And if it has `plane` it will be considered as an infinite plane and nothing else
 
+The spcript take 1 material per object and all the materials need to be just a Principled BSDF attached to a material output
+
 Next all the meshes in your scene need to be tris not quad to convert them you can use the triangulate modifier:
 First add the modifier the object
 
