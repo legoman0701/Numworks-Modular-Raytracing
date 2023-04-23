@@ -115,7 +115,13 @@ pc-5m 12s numworks n110 ~12h 43m 6s
 
 ![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%205m%2012s.png)
 
-146,75
+pc-30m 15s numworks n110 ~3j 1h 59m 11s
+
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%2030m%2015s.png)
+
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/evo.gif)
+
+the nomworks take routhly 146,75 the time of my computer
 
 <h1>For The futur</h1>
 
