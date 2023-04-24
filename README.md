@@ -121,6 +121,10 @@ pc-30m 15s numworks n110 ~3j 1h 59m 11s
 
 ![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%2030m%2015s.png)
 
+pc-20m 24s numworks n110 ~2j 1h 53m 42s
+
+![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/render%2020m%2024s.png)
+
 ![image](https://github.com/legoman0701/Numworks-Modular-Raytracing/blob/main/image/evo.gif)
 
 The numworks n110 take roughly 146,75 the time of my computer
