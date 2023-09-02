@@ -107,7 +107,7 @@ plane
     },
 
 
-<h1>Somes images</h1>
+<h1>Somes images ! Some of these images and time might be outdated !</h1>
 
 pc-11m 43s numworks n110 ~32h 10m 19s
 
