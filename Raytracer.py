@@ -246,9 +246,9 @@ def intersect_mesh(point, dir, object, colide_bbox):
     for triangle in mesh:
         a, b, c, normal = triangle
 
-        #a = add_vectors(a, object['position'])
-        #b = add_vectors(b, object['position'])
-        #c = add_vectors(c, object['position'])
+        a = add_vectors(a, object['position'])
+        b = add_vectors(b, object['position'])
+        c = add_vectors(c, object['position'])
     
         edgeAB = sub_vectors(b, a)
         edgeAC = sub_vectors(c, a)
