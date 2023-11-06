@@ -174,6 +174,7 @@ def calculate_color(point, dir, objects):
             rayColor = multiply_vectors(rayColor, lerp(objectColor, (1, 1, 1), isSpecBounce))
             incoLight = add_vectors(multiply_vector(multiply_vectors(emittedLight, rayColor), 1-object['metallic']), incoLight)
         else:
+            incoLight = add_vectors(incoLight, BACKGROUND)
             break
 
         reflect_dir = reflect_vector(dir, normal)
@@ -182,7 +183,6 @@ def calculate_color(point, dir, objects):
         dir = lerp(diffuse_dir, reflect_dir, mix*(isSpecBounce))
         point = pos
         
-    incoLight = add_vectors(incoLight, BACKGROUND)
     return hit_var, incoLight
 
 def intersect_sphere(point, dir, sphere):
@@ -246,41 +246,38 @@ def intersect_mesh(point, dir, object, colide_bbox):
     for triangle in mesh:
         a, b, c, normal = triangle
 
-        a = add_vectors(a, object['position'])
-        b = add_vectors(b, object['position'])
-        c = add_vectors(c, object['position'])
-        bboxma = []
-        bboxmi = []
-        for i in range(3):
-            bboxma.append(max(a[i]+0.01, b[i]+0.01, c[i]+0.01))
-            bboxmi.append(min(a[i]-0.01, b[i]-0.01, c[i]-0.01))
-        if ray_bbox_intersect(point, dir, [bboxma, bboxmi]):
-            edgeAB = sub_vectors(b, a)
-            edgeAC = sub_vectors(c, a)
-            normal_v = cross_vectors(edgeAB, edgeAC)
-            ao = sub_vectors(point, a)
-            dao = cross_vectors(ao, dir)
+        #a = add_vectors(a, object['position'])
+        #b = add_vectors(b, object['position'])
+        #c = add_vectors(c, object['position'])
+    
+        edgeAB = sub_vectors(b, a)
+        edgeAC = sub_vectors(c, a)
+        normal_v = cross_vectors(edgeAB, edgeAC)
+        ao = sub_vectors(point, a)
+        dao = cross_vectors(ao, dir)
 
-            determinant = -dot_product(dir, normal_v)
-            if determinant <= 0:
-                continue
-            invDet = 1.0 / determinant
+        determinant = -dot_product(dir, normal_v)
+        if determinant < EPSILON:
+            continue
+        invDet = 1.0 / determinant
 
-            t = dot_product(ao, normal_v) * invDet
-            u = dot_product(edgeAC, dao) * invDet
-            v = -dot_product(edgeAB, dao) * invDet
-            w = 1 - u - v
+        t = dot_product(ao, normal_v) * invDet
+        if t > closest_hit_dist:
+            continue
+        u = dot_product(edgeAC, dao) * invDet
+        v = -dot_product(edgeAB, dao) * invDet
+        w = 1 - u - v
 
-            if u < 0 or v < 0 or w < 0:
-                continue
+        if u <= 0 or v <= 0 or w <= 0:
+            continue
 
-            # find out where is the intersection point
-            intersection_point = add_vectors(point, multiply_vector(dir, t))
+        # find out where is the intersection point
+        intersection_point = add_vectors(point, multiply_vector(dir, t))
 
-            if t > EPSILON and t < closest_hit_dist: # ray intersection
-                closest_hit_dist = t
-                closest_hit_pos = intersection_point
-                closest_hit_normal = normal
+        if t > EPSILON and t <= closest_hit_dist: # ray intersection
+            closest_hit_dist = t
+            closest_hit_pos = intersection_point
+            closest_hit_normal = normal
 
     if closest_hit_dist == float('inf'):
         return False, float('inf'), (0, 0, 0), (0, 0, 0)
@@ -356,129 +353,44 @@ def tone_map_color(color):
         r = r + (b - 1)/10
         g = g + (b - 1)/10
         b = 1
-    if r > 1: r = 1
-    if g > 1: g = 1
+    r = min(r, 1)
+    g = min(g, 1)
     tone_mapped = (r, g, b)
     return tone_mapped
 
 #The scene need to be pasted between here
-backW = [[(1.36, 1.37, -1.4), (-1.38, 1.37, 1.4), (-1.38, 1.37, -1.4), (0.0, -1.0, -0.0)],
-[(-1.38, -1.37, -1.4), (1.4, -1.37, 1.4), (1.4, -1.37, -1.4), (0.0, 1.0, 0.0)],
-[(-1.38, -1.37, -1.4), (1.36, 1.37, -1.4), (-1.38, 1.37, -1.4), (0.0, -0.0, 1.0)],
-[(1.36, 1.37, -1.4), (1.38, 1.37, 1.4), (-1.38, 1.37, 1.4), (0.0, -1.0, -0.0)],
-[(-1.38, -1.37, -1.4), (-1.38, -1.37, 1.4), (1.4, -1.37, 1.4), (0.0, 1.0, 0.0)],
-[(-1.38, -1.37, -1.4), (1.4, -1.37, -1.4), (1.36, 1.37, -1.4), (0.0, -0.0, 1.0)],
-]
-light = [[(0.41, 0.0, -0.42), (-0.41, -0.0, 0.42), (-0.41, 0.0, -0.42), (0.0, -1.0, -0.0)],
-[(0.41, 0.0, -0.42), (0.42, -0.0, 0.42), (-0.41, -0.0, 0.42), (0.0, -1.0, -0.0)],
-]
-boxR = [[(1.4, -1.37, -1.4), (1.38, 1.37, 1.4), (1.36, 1.37, -1.4), (-1.0, -0.01, 0.01)],
-[(1.4, -1.37, -1.4), (1.4, -1.37, 1.4), (1.38, 1.37, 1.4), (-1.0, -0.01, -0.0)],
-]
-boxG = [[(-1.38, -1.37, 1.4), (-1.38, 1.37, -1.4), (-1.38, 1.37, 1.4), (1.0, 0.0, 0.0)],
-[(-1.38, -1.37, 1.4), (-1.38, -1.37, -1.4), (-1.38, 1.37, -1.4), (1.0, 0.0, 0.0)],
-]
-CubeR = [[(-0.51, -0.4, 0.24), (-0.24, 0.4, -0.51), (-0.24, -0.4, -0.51), (-0.94, 0.0, -0.34)],
-[(-0.51, 0.4, 0.24), (0.51, 0.4, -0.24), (-0.24, 0.4, -0.51), (0.0, 1.0, -0.0)],
-[(0.24, 0.4, 0.51), (0.51, -0.4, -0.24), (0.51, 0.4, -0.24), (0.94, 0.0, 0.34)],
-[(0.24, -0.4, 0.51), (-0.24, -0.4, -0.51), (0.51, -0.4, -0.24), (-0.0, -1.0, 0.0)],
-[(0.51, 0.4, -0.24), (-0.24, -0.4, -0.51), (-0.24, 0.4, -0.51), (0.34, 0.0, -0.94)],
-[(-0.51, 0.4, 0.24), (0.24, -0.4, 0.51), (0.24, 0.4, 0.51), (-0.34, 0.0, 0.94)],
-[(-0.51, -0.4, 0.24), (-0.51, 0.4, 0.24), (-0.24, 0.4, -0.51), (-0.94, -0.0, -0.34)],
-[(-0.51, 0.4, 0.24), (0.24, 0.4, 0.51), (0.51, 0.4, -0.24), (0.0, 1.0, 0.0)],
-[(0.24, 0.4, 0.51), (0.24, -0.4, 0.51), (0.51, -0.4, -0.24), (0.94, -0.0, 0.34)],
-[(0.24, -0.4, 0.51), (-0.51, -0.4, 0.24), (-0.24, -0.4, -0.51), (0.0, -1.0, 0.0)],
-[(0.51, 0.4, -0.24), (0.51, -0.4, -0.24), (-0.24, -0.4, -0.51), (0.34, 0.0, -0.94)],
-[(-0.51, 0.4, 0.24), (-0.51, -0.4, 0.24), (0.24, -0.4, 0.51), (-0.34, 0.0, 0.94)],
-]
-CubeL = [[(-0.24, -0.4, 0.51), (-0.51, 1.4, -0.24), (-0.51, -0.4, -0.24), (-0.94, -0.0, 0.34)],
-[(-0.24, 1.4, 0.51), (0.24, 1.4, -0.51), (-0.51, 1.4, -0.24), (-0.0, 1.0, -0.0)],
-[(0.51, 1.4, 0.24), (0.24, -0.4, -0.51), (0.24, 1.4, -0.51), (0.94, 0.0, -0.34)],
-[(0.51, -0.4, 0.24), (-0.51, -0.4, -0.24), (0.24, -0.4, -0.51), (0.0, -1.0, -0.0)],
-[(0.24, 1.4, -0.51), (-0.51, -0.4, -0.24), (-0.51, 1.4, -0.24), (-0.34, 0.0, -0.94)],
-[(-0.24, 1.4, 0.51), (0.51, -0.4, 0.24), (0.51, 1.4, 0.24), (0.34, -0.0, 0.94)],
-[(-0.24, -0.4, 0.51), (-0.24, 1.4, 0.51), (-0.51, 1.4, -0.24), (-0.94, -0.0, 0.34)],
-[(-0.24, 1.4, 0.51), (0.51, 1.4, 0.24), (0.24, 1.4, -0.51), (0.0, 1.0, -0.0)],
-[(0.51, 1.4, 0.24), (0.51, -0.4, 0.24), (0.24, -0.4, -0.51), (0.94, 0.0, -0.34)],
-[(0.51, -0.4, 0.24), (-0.24, -0.4, 0.51), (-0.51, -0.4, -0.24), (0.0, -1.0, -0.0)],
-[(0.24, 1.4, -0.51), (0.24, -0.4, -0.51), (-0.51, -0.4, -0.24), (-0.34, -0.0, -0.94)],
-[(-0.24, 1.4, 0.51), (-0.24, -0.4, 0.51), (0.51, -0.4, 0.24), (0.34, 0.0, 0.94)],
-]
 objects = [
     {
-        'type': 'mesh',
-        'mesh': backW,
-        'position': (0.0, 0.0, -6.900001525878906),
-        'color': (0.4000000059604645, 0.4000000059604645, 0.4000000059604645),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (0.0, 0.0, 0.0),
-        'emmisiveStrenght': 1.0
+        'type': 'sphere',
+        'position': (0, 0, -7),
+        'radius': 1,
+        'color': (0, 1, 0),
+        'metallic': 0,
+        'roughness': 1,
+        'specular': 0,
+        'emmisiveColor': (1, 1, 1),
+        'emmisiveStrenght': 0
     },
     {
-        'type': 'mesh',
-        'mesh': light,
-        'position': (-0.0059999823570251465, 1.350000023841858, -6.900000095367432),
-        'color': (1.0, 1.0, 1.0),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (1.0, 1.0, 1.0),
-        'emmisiveStrenght': 1.0
-    },
-    {
-        'type': 'mesh',
-        'mesh': boxR,
-        'position': (0.0, 0.0, -6.900001525878906),
-        'color': (0.5, 0.0, 0.0),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (0.0, 0.0, 0.0),
-        'emmisiveStrenght': 1.0
-    },
-    {
-        'type': 'mesh',
-        'mesh': boxG,
-        'position': (0.0, 0.0, -6.900001525878906),
-        'color': (0.0, 0.5, 0.0),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (0.0, 0.0, 0.0),
-        'emmisiveStrenght': 1.0
-    },
-    {
-        'type': 'mesh',
-        'mesh': CubeR,
-        'position': (0.6000000238418579, -1.0, -7.5),
-        'color': (0.4000000059604645, 0.4000000059604645, 0.4000000059604645),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (0.0, 0.0, 0.0),
-        'emmisiveStrenght': 1.0
-    },
-    {
-        'type': 'mesh',
-        'mesh': CubeL,
-        'position': (-0.7000000476837158, -1.0, -7.099999904632568),
-        'color': (0.4000000059604645, 0.4000000059604645, 0.4000000059604645),
-        'metallic': 0.0,
-        'roughness': 1.0,
-        'specular': 0.0,
-        'emmisiveColor': (0.0, 0.0, 0.0),
-        'emmisiveStrenght': 1.0
-    },
+        'type': 'plane',
+        'position': (0, -1, 0),
+        'normal': (0, 1, 0),
+        'size': 5,
+        'color': (1, 1, 1),
+        'metallic': 0,
+        'roughness': 1,
+        'specular': 0,
+        'emmisiveColor': (1, 1, 1),
+        'emmisiveStrenght': 0
+    }
 ]
 
 lights = [
     {
-        'position': (0.0, 1.0999999046325684, -7.0),
-        'radius': 0.5,
+        'position': (0.0, 5, -3.4510927200317383),
+        'radius': 0.10000000149011612,
         'emmisiveColor': (1.0, 1.0, 1.0),
-        'emmisiveStrenght': 5.2
+        'emmisiveStrenght': 10.0
     },
 ]
 
@@ -486,7 +398,7 @@ camera = {
     'position': (0.0, 0.0, 0.0),
     'rotation': (math.radians(0.0), math.radians(0.0), math.radians(0.0)),
     'focus': 10.0,
-    'far_plane': 1000.0,
+    'far_plane': 100.0,
     'fov': math.radians(27.999968417477657)
 }
 #and there
@@ -517,10 +429,10 @@ print(bboxs)
 HEIGHT = 222
 WIDTH = 320
 SIZE = 1
-DEPTH = 15
-SAMPLE = 15
+DEPTH = 10
+SAMPLE = 30
 EPSILON = 0.0001
-BACKGROUND = (0, 0, 0)
+BACKGROUND = (0.05, 0.05, 0.05)
 
 dT = 0
 start = time.time()
@@ -552,7 +464,7 @@ dur = time.time() - start
 Trm, Trs = divmod(dur, 60)
 print(f"Render finished {int(Trm)}m {int(Trs)}s")
 start = time.time()
-#denoise() # Dose not work with beta of the kandinsky module
+denoise() # Dose not work with beta of the kandinsky module
 dur = time.time() - start
 Trm, Trs = divmod(dur, 60)
 print(f"Denoise finished {int(Trm)}m {int(Trs)}s")
